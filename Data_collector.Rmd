@@ -1,0 +1,143 @@
+---
+title: "GithubApi"
+author: "Guan.Xin"
+date: "2019/4/5"
+output: 
+  pdf_document: default
+  html_notebook: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(jsonlite)
+library(httpuv)
+library(httr)
+library(mongolite)
+```
+
+# Set Up github API
+```{r}
+oauth_endpoints("github")
+projectApp <- oauth_app(appname = "GuanXin_Github_and_World",
+                        key = "1151cd623b25dc65040b",
+                        secret = "5343cd60555c10ccbeb6ace4adf8594b887f3024")
+
+github_token <- oauth2.0_token(oauth_endpoints("github"), projectApp)
+gtoken <- config(token = github_token)
+
+# This function helps get something manually
+github_get <- function(path){
+  url <- modify_url("https://api.github.com", path = path)
+  GET(url, gtoken)
+}
+
+# This function get a json file from given url
+github_get_with_url<- function(path){
+  url <- modify_url(path)
+  req <- GET(path, gtoken) 
+  stop_for_status(req)
+  req <- req %>% content %>% jsonlite::toJSON()
+  return(req)
+}
+```
+# connect to database
+```{r}
+# db for users
+db.user <- mongo(collection = "users", db = "github", url = "mongodb://localhost:27123")
+# db for repositories
+db.repo <- mongo(collection = "repos", db = "github", url = "mongodb://localhost:27123")
+```
+
+# functions to run api
+```{r}
+store_db_user <- function(user_url){
+  # get user informationg from github
+  user_json <- github_get_with_url(user_url)
+  user_list <- jsonlite::fromJSON(user_json)
+  user_id <- user_list[["id"]]
+  print(user_id)
+  # find id in mongoDB
+  query <- sprintf('{"id" : %s}', user_id)
+  if(db.user$find(query) %>% nrow() == 0){
+    db.user$insert(user_json)
+    return(TRUE)
+  }
+  return(FALSE)
+}
+
+# print nongodb to a csv file  
+mongo_to_csv <- function(database, file_name){
+  db_list <- database$find('{}')
+  df <- sapply(db_list, toString) %>% t %>% data.frame(stringsAsFactors = F)
+  write.csv(df, file = file_name, row.names = F)
+}
+
+get_foller_url <- function(user_id, df){
+  query <- sprintf('{"id" : %s}', user_id)
+  if(db.user$find() %>% nrow() == 0){
+    db.user$insert(user_json)
+  }
+}
+
+
+
+
+
+
+# form a data fram for this particular user
+  user_df <- sapply(user_list, toString) %>% t %>% data.frame(stringsAsFactors = F)
+  # find id in df
+  user_id <- user_df$id
+  print(user_id)
+  all_users <- df$id
+  if(!(user_id %in% all_users)){
+    df <- df %>% rbind(user_df)
+  }
+  
+# print nongodb to a csv file  
+mongo_to_csv <- function(database, file_name){
+  db_list <- database$find('{}')
+  df <- sapply(db_list, toString) %>% t %>% data.frame(stringsAsFactors = F)
+  write.csv(df, file = file_name, row.names = F)
+}
+#user_id <- 33470168
+#query <- sprintf('{"id" : %s}', user_id)
+#find <- db.user$find(query)
+#nrow(find)
+#print(find)#
+#user_data <- data.frame()
+user_data <- store_db_user("https://api.github.com/users/imbaguanxin")
+class(user_data[1,1]) 
+write.csv(user_data, row.names = F, file = "user_data.csv")
+
+req <- github_get("/users/imbaguanxin")
+stop_for_status(req)
+json1 = jsonlite::toJSON(content(req))
+gitDF = jsonlite::fromJSON(json1)
+#gitDF$login
+#follower <- github_api("users/imbaguanxin/followers")
+#follower
+#mongoData<- mongo("gitDF")
+#mongoData$insert(gitDF) 
+#mongoData$count('{"id":""}')
+
+user_df <- data.frame(matrix(unlist(gitDF), nrow = length(gitDF), byrow = F))
+user_df <- data.frame(t(sapply(gitDF,c)))
+
+View(sapply(gitDF,c) %>% sapply(unlist) %>% t %>% data.frame())
+#names(user_df) <- names(gitDF)
+for(name in names(gitDF)){
+  user_df[name] <- gitDF[[name]]
+}  
+
+test <- sapply(gitDF, toString) %>% t %>% data.frame(stringsAsFactors = F)
+test <- test[1,1]
+test <- as.data.frame(gitDF)
+db$insert(json1)
+df <- db$find('{"company" : "Northeastern University"}')
+df$name %>% unlist
+print(df)
+db$disconnect()
+```
+
