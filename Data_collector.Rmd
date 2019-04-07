@@ -23,6 +23,10 @@ projectApp <- oauth_app(appname = "GuanXin_Github_and_World",
                         key = "1151cd623b25dc65040b",
                         secret = "5343cd60555c10ccbeb6ace4adf8594b887f3024")
 
+#projectApp <- oauth_app(appname = "JamesgeziqianGitOAuthApp",
+#                        key = "885b524769dc6bef013f",
+#                        secret = "ebac8d1117a038c5facb0a9f8d2be38833d37c60")
+
 github_token <- oauth2.0_token(oauth_endpoints("github"), projectApp)
 gtoken <- config(token = github_token)
 
@@ -187,16 +191,16 @@ mongo_to_csv <- function(database, file_name){
   write.csv(df, file = file_name, row.names = F)  
 }
 ```
-# start fetch
-```{r}
-id_vec <- get_all_user_id()
-fetch_users(id_vec)
-```
-
-# try block
+# set up
 ```{r}
 store_user_to_db(user_url = "https://api.github.com/users/imbaguanxin", dest_db = db.userUnfetched, check_db = db.user)
 follower <- get_follers_by_id(33470168, db.userUnfetched)
 following <- get_follering_by_id(33470168)
-mongo_to_csv(db.userUnfetched, "user.csv")
+# mongo_to_csv(db.userUnfetched, "user.csv")
+```
+# start fetch
+```{r}
+id_vec <- get_all_user_id()
+fetch_users(id_vec)
+# mongo_to_csv(db.userUnfetched, "user.csv")
 ```
