@@ -1,4 +1,4 @@
-MongoDB 命令：
+# MongoDB 命令：
 
 - mongod --dbpath D:\githubrepo\GitHub-and-World\MongoDB\db --port=27100 -f D:\githubrepo\GitHub-and-World\MongoDB\mongodb.conf
 
@@ -8,9 +8,30 @@ MongoDB 命令：
 
   链接数据库。 可以看到连接到了哪里
 
-- show databases
-
 - mongod -f [conf文件 path] 输出日志(启动服务)
+
+- mongorestore -h <hostname><:port> -d <database> -c <collection_name> --drop <path>
+	
+	Examples:
+	
+	1. -h localhost:27123
+	2. -d github
+	3. -c 
+	4. --drop : Before restoring the collections from file, drop the collection from target database.
+	5. <path> ~\db\dump
+
+- mongoexport --db <db_name> --collection <collection——name> --type=csv --fields <field1,field2,...> --out <file_name>
+	
+	Examples:
+	
+	1. --db github
+	2. --collection users/unfetched
+	3. --fields : id,url,type,name,company,blog,location,email,hireable,bio,public_repos,public_gists,followers,following
+	4. --out users.csv
+	
+# query 命令：
+
+- show databases
 
 - use admin：切换到admin数据库
 

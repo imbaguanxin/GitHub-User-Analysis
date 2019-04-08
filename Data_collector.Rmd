@@ -173,9 +173,9 @@ get_all_user_id <- function(db = db.userUnfetched){
 ```
 # export mongoDB
 ```{r}
-# export mongodb as a data frame
-mongo_to_df <- function(database){
-  db_list <- database$find('{}')
+# export mongodb to a data frame with query
+mongo_to_df_query <- function(database, query){
+  db_list <- database$find(query)
   df <- db_list %>% as.tibble()
   df <- apply(df, 2, as.character) %>% data.frame(stringsAsFactors = F)
   for(name in names(df)){
@@ -184,6 +184,10 @@ mongo_to_df <- function(database){
   return(df)
 }
 
+# export mongodb as a data frame
+mongo_to_df <- function(database){
+  return(mongo_to_df_query(database, '{}'))
+}
 
 # print nongodb to a csv file  
 mongo_to_csv <- function(database, file_name){
@@ -198,9 +202,24 @@ follower <- get_follers_by_id(33470168, db.userUnfetched)
 following <- get_follering_by_id(33470168)
 # mongo_to_csv(db.userUnfetched, "user.csv")
 ```
-# start fetch
+# fetch
 ```{r}
 id_vec <- get_all_user_id()
 fetch_users(id_vec)
 # mongo_to_csv(db.userUnfetched, "user.csv")
+```
+# export to df and csv
+```{r}
+df <- mongo_to_df(db.user)
+df <- df %>% rbind(mongo_to_df(db.userUnfetched))
+df <- df[, -c(3:16)]
+
+df$followers <- df$followers %>% as.numeric()
+df$following <- df$following %>% as.numeric()
+df <- df %>% arrange(desc(followers))
+df <- df %>% arrange(desc(following))
+
+ggplot(data = df) +
+  geom_point(mapping = aes(x = followers, y = following), position = "jitter")
+
 ```
