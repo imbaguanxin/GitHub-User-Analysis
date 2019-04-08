@@ -34,6 +34,7 @@ We are trying to predict the place where high-tech industry develops the best gi
 Tools we use:
 - GitHub API
 - R Language
+- MongoDB
 
 We will try our best to keep our code in R. Since some data might not be available through Github API, we might use use third-party GitHub data, such as GHTorrent, and GHArchive. However, we would rather try to fetch data by ourselves so that the process of getting unbiased data is crystal clear to us.
 
