@@ -55,7 +55,7 @@ db.repo <- mongo(collection = "repos", db = "github", url = "mongodb://localhost
 db.userUnfetched <- mongo(collection = "unfetched", db = "github", url = "mongodb://localhost:27123")
 ```
 
-# functions to run api
+# functions to process user information
 ```{r}
 store_user_to_db <- function(dest_db, check_db, user_url){
   # get user informationg from github
@@ -193,6 +193,21 @@ mongo_to_df <- function(database){
 mongo_to_csv <- function(database, file_name){
   df <- mongo_to_df(database)
   write.csv(df, file = file_name, row.names = F)  
+}
+```
+# funtions to store repositories
+```{r}
+id_get_repo <- function(user_id, toDB = db.repo ){
+  
+}
+toDB <- db.repo
+user_id <- 33470168
+query <- sprintf('{"id" : %s}', user_id)
+user_df <- db.user$find(query)
+if (user_df %>% length > 0){
+  repo_url <- user_df[["repos_url"]] %>% unlist
+  repos_json <- github_get_with_url(repo_url) %>% fromJSON
+  db.repo$insert(repos_json)
 }
 ```
 # set up

@@ -71,7 +71,7 @@ only_location <- data.frame(only_location) %>%
   group_by(only_location) %>% count() %>% arrange(desc(n))
 
 only_location %>% with(
-  wordcloud(only_location, n, max.words = 180, colors=brewer.pal(8, "Dark2")))
+  wordcloud(only_location, n, max.words = 100, colors=brewer.pal(8, "Dark2")))
 ```
 
 ## enerate locations
@@ -105,7 +105,26 @@ ggplot(data = head(top_location, 10), mapping = aes(x = factor(1), y = n, fill =
   coord_polar(theta = "y") +
   theme_void()
 ```
+bio info text mining
+```{r}
+bios <- user_readable_df$bio  %>% toString() %>% 
+  str_remove_all("@|\\b[A-Z]\\b|\\b[A-Z]?[a-z]{1,3}\\b") %>%
+  str_split("[ ,-]") %>% unlist %>% 
+  str_remove_all(" |with|like|that|from|about|since|love|make|things|more|build|\\bs\\b|\\W|[0-9]+") %>% 
+  str_trim() %>%
+  tolower()
+bios <- data.frame(bios, stringsAsFactors = FALSE) %>% 
+  group_by(bios) %>% count() %>% arrange(desc(n))
+bios[-1,] %>% with(wordcloud(bios, n, max.words = 50, colors=brewer.pal(8, "Dark2")))
 
+ggplot(data = bios[-1,] %>% head(20), 
+       mapping = aes(x = reorder(bios, -n), y = n, fill = bios)) +
+  geom_bar(stat = "identity") +
+  theme(axis.text.x = element_text(size = 8, vjust = 1, hjust = 1, angle = 60)) +
+  labs(x = "Word In Bios", y = "Frequency")+
+  theme(legend.position="top")
+```
+Catagorize people
 ```{r}
 bio_df <- user_readable_df %>% filter(bio != "", company !="")
 bio_df$university <- bio_df$company %>% str_detect("(C|c)ollege|(I|i)nstitute|(U|u)niversity|(S|s)chool|(A|a)cademy|.*U\\b|U.*\\b|UC|ETH|Tech|(S|s)tanford")
@@ -116,7 +135,6 @@ bio_df$engineer <- bio_df$bio %>%
   str_detect("(E|e)ngineer")
   
 bio_df <- bio_df %>% select(university, professor, student, engineer, bio, company)
-
 
 
 follow_following <- user_df %>% filter(following < 1000, followers < 50000)
