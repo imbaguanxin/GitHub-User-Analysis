@@ -1,0 +1,48 @@
+---
+title: "User_Analyse"
+author: "ZiqianGe"
+date: "4/7/2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(mongolite)
+library(tidyverse)
+```
+
+```{r}
+userdb <- mongo(db = "users", collection = "users", url = "mongodb://127.0.0.1:27017")
+repodb <- mongo(db = "repos", collection = "repos", url = "mongodb://127.0.0.1:27017")
+```
+```{r}
+userdb$import(file("../../overview-f17/MongoDB/db/dump/github/users.bson"), bson = TRUE)
+```
+```{r}
+repodb$import(file("../../overview-f17/MongoDB/db/dump/github/repos.bson"), bson = TRUE)
+```
+Language distribution.
+```{r}
+langs <- repodb$find(fields = '{"_id" : false, "language" : true}') %>% na.omit()
+sortedLangs <- langs %>% group_by(language) %>% count() %>% arrange(desc(n))
+sortedLangs
+ggplot(sortedLangs %>% filter(n > 500)) +
+  geom_bar(mapping = aes(x = language, y = n), stat = "identity") +
+  theme(axis.text.x = element_text(vjust = 0.5, hjust = 1, angle = 90))
+pieLangs <- sortedLangs %>% filter(n > 1500)
+pieLangs$per <- pieLangs$n / sum(pieLangs$n)
+ggplot(pieLangs, mapping = aes(x = "", y = per, fill = language)) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar(theta = "y") +
+  #geom_text(aes(x = 1, y = cumsum(pieLangs$per) - pieLangs$per / 2), 
+  #          label = percent(pieLangs$per), size = 5) +
+  theme_void()
+```
+```{r}
+repoProperties <- repodb$find(
+  fields = '{"_id" : false, "full_name" : true, "stargazers_count" : true, "forks_count" : true, "open_issues_count" : true}')
+repoProperties <- repoProperties %>% filter((stargazers_count > 0)
+                                            | (forks_count > 0)
+                                            | (open_issues_count > 0))
+```
+
