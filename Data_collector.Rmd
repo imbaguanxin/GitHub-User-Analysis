@@ -223,3 +223,12 @@ ggplot(data = df) +
   geom_point(mapping = aes(x = followers, y = following), position = "jitter")
 
 ```
+
+```{r}
+timer <- function(interval = 3601){
+  id_vec <- get_all_user_id()
+  fetch_users(id_vec)
+  later::later(timer, interval)
+}
+```
+
