@@ -146,11 +146,9 @@ outlier <- function(df, variable_name){
   df
 }
 
+clean_following <- outlier(user_readable_df %>% filter(following > 0, followers > 0), "following") %>% outlier("followers")
 
-  
-outlier(following, "followers")
-
-ggplot(data = follow_following) +
+ggplot(data = clean_following) +
   geom_smooth(mapping = aes(x = followers, y = following))
 ```
 
