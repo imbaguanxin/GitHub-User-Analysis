@@ -137,7 +137,18 @@ bio_df$engineer <- bio_df$bio %>%
 bio_df <- bio_df %>% select(university, professor, student, engineer, bio, company)
 
 
-follow_following <- user_df %>% filter(following < 1000, followers < 50000)
+outlier <- function(df, variable_name){
+  mean <- mean(df[,variable_name])
+  threeSd <- sd(df[,variable_name]) * 3
+  print(sprintf("mean: %f, sd: %f", mean, threeSd/3))
+  df <- df %>% filter(df[variable_name] < mean + threeSd)
+  df <- df %>% filter(df[variable_name] > mean - threeSd)
+  df
+}
+
+
+  
+outlier(following, "followers")
 
 ggplot(data = follow_following) +
   geom_smooth(mapping = aes(x = followers, y = following))
