@@ -154,7 +154,7 @@ ggplot(data = clean_following %>% filter(following < 250)) +
   geom_density(mapping = aes(x = following), bins = 20)
 # user_readable_df %>% filter(following > 3000) %>% select (login, id, following) %>% arrange (desc(following))
 ggplot(data = clean_following) +
-  geom_smooth(mapping = aes(x = followers, y = following))
+  geom_smooth(mapping = aes(x = following, y = followers)) 
 ```
 
 
