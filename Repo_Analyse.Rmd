@@ -12,37 +12,132 @@ library(tidyverse)
 ```
 
 ```{r}
-userdb <- mongo(db = "users", collection = "users", url = "mongodb://127.0.0.1:27017")
-repodb <- mongo(db = "repos", collection = "repos", url = "mongodb://127.0.0.1:27017")
+userdb_190401 <- mongo(db = "users", collection = "users_190401", url = "mongodb://127.0.0.1:27017")
+repodb_190401 <- mongo(db = "repos", collection = "repos_190401", url = "mongodb://127.0.0.1:27017")
+userdb_180415 <- mongo(db = "users", collection = "users_180415", url = "mongodb://127.0.0.1:27017")
+repodb_180415 <- mongo(db = "repos", collection = "repos_180415", url = "mongodb://127.0.0.1:27017")
+userdb_170415 <- mongo(db = "users", collection = "users_170415", url = "mongodb://127.0.0.1:27017")
+repodb_170415 <- mongo(db = "repos", collection = "repos_170415", url = "mongodb://127.0.0.1:27017")
+userdb_160415 <- mongo(db = "users", collection = "users_160415", url = "mongodb://127.0.0.1:27017")
+repodb_160415 <- mongo(db = "repos", collection = "repos_160415", url = "mongodb://127.0.0.1:27017")
 ```
 ```{r}
-userdb$import(file("../../overview-f17/MongoDB/db/dump/github/users.bson"), bson = TRUE)
+userdb_190401$import(file("/Volumes/LaCie/MongoDB/db/dump_2019_04_01/github/users.bson"), bson = TRUE)
+repodb_190401$import(file("/Volumes/LaCie/MongoDB/db/dump_2019_04_01/github/repos.bson"), bson = TRUE)
+#userdb_190401$import(file("~/overview-f17/MongoDB/db/dump_2019_04_01/github/users.bson"), bson = TRUE)
+#repodb_190401$import(file("~/overview-f17/MongoDB/db/dump_2019_04_01/github/repos.bson"), bson = TRUE)
+userdb_180415$import(file("/Volumes/LaCie/MongoDB/db/dump_2018_04_15/github/users.bson"), bson = TRUE)
+repodb_180415$import(file("/Volumes/LaCie/MongoDB/db/dump_2018_04_15/github/repos.bson"), bson = TRUE)
+userdb_170415$import(file("/Volumes/LaCie/MongoDB/db/dump_2017_04_15/github/users.bson"), bson = TRUE)
+repodb_170415$import(file("/Volumes/LaCie/MongoDB/db/dump_2017_04_15/github/repos.bson"), bson = TRUE)
+userdb_160415$import(file("/Volumes/LaCie/MongoDB/db/dump_2016_04_15/github/users.bson"), bson = TRUE)
+repodb_160415$import(file("/Volumes/LaCie/MongoDB/db/dump_2016_04_15/github/repos.bson"), bson = TRUE)
 ```
+
+Language distribution in Apr. 1st, 2019.
 ```{r}
-repodb$import(file("../../overview-f17/MongoDB/db/dump/github/repos.bson"), bson = TRUE)
-```
-Language distribution.
-```{r}
-langs <- repodb$find(fields = '{"_id" : false, "language" : true}') %>% na.omit()
-sortedLangs <- langs %>% group_by(language) %>% count() %>% arrange(desc(n))
-sortedLangs
-ggplot(sortedLangs %>% filter(n > 500)) +
-  geom_bar(mapping = aes(x = language, y = n), stat = "identity") +
+langs_190401 <- repodb_190401$find(fields = '{"_id" : false, "full_name" : true, "language" : true}')
+cleanedLangs_190401 <- langs_190401 %>% 
+  na.omit() %>%
+  distinct(full_name, .keep_all = TRUE) %>%
+  group_by(language) %>% 
+  count() %>% 
+  arrange(desc(n))
+cleanedLangs_190401$Percentage <- cleanedLangs_190401$n / sum(cleanedLangs_190401$n)
+cleanedLangs_190401
+ggplot(cleanedLangs_190401 %>% filter(Percentage > 0.01)) +
+  geom_bar(mapping = aes(x = language, y = Percentage), stat = "identity") +
   theme(axis.text.x = element_text(vjust = 0.5, hjust = 1, angle = 90))
-pieLangs <- sortedLangs %>% filter(n > 1500)
-pieLangs$per <- pieLangs$n / sum(pieLangs$n)
-ggplot(pieLangs, mapping = aes(x = "", y = per, fill = language)) +
+pieLangs_190406 <- cleanedLangs_190401 %>% head(10)
+ggplot(pieLangs_190406, mapping = aes(x = "", y = Percentage, fill = language)) +
   geom_bar(width = 1, stat = "identity") +
   coord_polar(theta = "y") +
-  #geom_text(aes(x = 1, y = cumsum(pieLangs$per) - pieLangs$per / 2), 
-  #          label = percent(pieLangs$per), size = 5) +
   theme_void()
 ```
 ```{r}
-repoProperties <- repodb$find(
-  fields = '{"_id" : false, "full_name" : true, "stargazers_count" : true, "forks_count" : true, "open_issues_count" : true}')
-repoProperties <- repoProperties %>% filter((stargazers_count > 0)
-                                            | (forks_count > 0)
-                                            | (open_issues_count > 0))
+langs_180415 <- repodb_180415$find(fields = '{"_id" : false, "full_name" : true, "language" : true}')
+cleanedLangs_180415 <- langs_180415 %>% 
+  na.omit() %>%
+  distinct(full_name, .keep_all = TRUE) %>%
+  group_by(language) %>% 
+  count() %>% 
+  arrange(desc(n))
+cleanedLangs_180415$Percentage <- cleanedLangs_180415$n / sum(cleanedLangs_180415$n)
+cleanedLangs_180415
 ```
+```{r}
+langs_170415 <- repodb_170415$find(fields = '{"_id" : false, "full_name" : true, "language" : true}')
+cleanedLangs_170415 <- langs_170415 %>% 
+  na.omit() %>%
+  distinct(full_name, .keep_all = TRUE) %>%
+  group_by(language) %>% 
+  count() %>% 
+  arrange(desc(n))
+cleanedLangs_170415$Percentage <- cleanedLangs_170415$n / sum(cleanedLangs_170415$n)
+cleanedLangs_170415
+```
+```{r}
+langs_160415 <- repodb_160415$find(fields = '{"_id" : false, "full_name" : true, "language" : true}')
+cleanedLangs_160415 <- langs_160415 %>% 
+  na.omit() %>%
+  distinct(full_name, .keep_all = TRUE) %>%
+  group_by(language) %>% 
+  count() %>% 
+  arrange(desc(n))
+cleanedLangs_160415$Percentage <- cleanedLangs_160415$n / sum(cleanedLangs_160415$n)
+cleanedLangs_160415
+ggplot(cleanedLangs_160415 %>% filter(Percentage > 0.01)) +
+  geom_bar(mapping = aes(x = language, y = Percentage), stat = "identity") +
+  theme(axis.text.x = element_text(vjust = 0.5, hjust = 1, angle = 90))
+pieLangs_160415 <- cleanedLangs_160415 %>% head(10)
+ggplot(pieLangs_160415, mapping = aes(x = "", y = Percentage, fill = language)) +
+  geom_bar(width = 1, stat = "identity") +
+  coord_polar(theta = "y") +
+  theme_void()
+```
+
+```{r}
+comparison <- cleanedLangs_190401 %>%
+  inner_join(cleanedLangs_180415, by = "language") %>%
+  inner_join(cleanedLangs_170415, by = "language") %>%
+  inner_join(cleanedLangs_160415, by = "language")
+colnames(comparison) <- c("language",
+                          "190401", "Percentage_190401",
+                          "180415", "Percentage_180415",
+                          "170415", "Percentage_170415",
+                          "160415", "Percentage_160415")
+comparison <- comparison %>%
+  arrange(desc(`Percentage_190401`
+               + `Percentage_180415`
+               + `Percentage_170415`
+               + `Percentage_160415`))
+comparison
+comparison %>%
+  filter(Percentage_190401 > 0.02) %>%
+  gather(key = "date", value = "Percentage",
+         -language, -`190401`, -`180415`, -`170415`, -`160415`) %>%
+  ggplot(mapping = aes(x = language, y = Percentage, fill = date)) +
+  geom_bar(width = 1, stat = "identity", position = "dodge") +
+  theme(axis.text.x = element_text(vjust = 0.5, hjust = 1, angle = 90))
+```
+
+```{r}
+cleanedLangs_190401 %>% with(wordcloud(language, n, max.words = 100, colors=brewer.pal(8, "Dark2")))
+cleanedLangs_160415 %>% with(wordcloud(language, n, max.words = 100, colors=brewer.pal(8, "Dark2")))
+```
+
+```{r}
+repoProperties_190401 <- repodb_190401$find(
+  fields = '{"_id" : false, "full_name" : true, "language" : true, "stargazers_count" : true, "forks_count" : true, "open_issues_count" : true, "subscribers_count" : true}')
+repoProperties_190401 <- repoProperties_190401 %>% 
+  na.omit() %>%
+  distinct(full_name, .keep_all = TRUE) %>%
+  filter((stargazers_count > 0)
+         | (forks_count > 0)
+         | (open_issues_count > 0)
+         | (subscribers_count > 0)) %>%
+  arrange(desc(stargazers_count + forks_count + open_issues_count + subscribers_count))
+View(repoProperties_190401)
+```
+
 
