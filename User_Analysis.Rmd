@@ -146,8 +146,13 @@ outlier <- function(df, variable_name){
   df
 }
 
-clean_following <- outlier(user_readable_df %>% filter(following > 0, followers > 0), "following") %>% outlier("followers")
+clean_following <- outlier(user_readable_df %>% filter(following > 0, followers > 0), "following") 
+clean_following %>% filter(following < 250) %>% count / clean_following %>% count()
 
+ggplot(data = clean_following %>% filter(following < 250)) +
+  geom_histogram(mapping = aes(x = following, y = ..density..), bins = 20) +
+  geom_density(mapping = aes(x = following), bins = 20)
+# user_readable_df %>% filter(following > 3000) %>% select (login, id, following) %>% arrange (desc(following))
 ggplot(data = clean_following) +
   geom_smooth(mapping = aes(x = followers, y = following))
 ```
