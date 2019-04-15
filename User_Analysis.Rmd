@@ -134,8 +134,11 @@ bio_df$student <- bio_df$bio %>%
 bio_df$engineer <- bio_df$bio %>% 
   str_detect("(E|e)ngineer")
 
-# bio_df$company <- bio_df$company %>% str_remove_all("@") %>% tolower() %>% str_trim()
-# bio_df %>% group_by(company) %>% count %>% arrange (desc(n))
+companys <- bio_df$company %>% str_remove_all("@") %>% tolower()  %>%
+  str_split("[,-/\\|]") %>% unlist %>% str_trim() %>%
+  str_remove_all("\\b(com|inc|io|http(:|s:?)?|llc|ltd|io|www|net|org)\\b|[^\\w\\s]")
+companys <- data.frame(companys, stringsAsFactors = FALSE) %>% 
+  group_by(companys) %>% count() %>% arrange(desc(n))
 # bio_df <- bio_df %>% select(university, professor, student, engineer, bio, company)
 
 
@@ -166,6 +169,7 @@ get_repo_with_owner <- function(db = db.repo){
   df$owner <- df$owner$id %>% unlist
   return(df)
 }
+repo_user <- get_repo_with_owner()
 
 find_repo <- function(repo_id, db = db.repo){
   query <- sprintf('{ "id" : %s }', repo_id)
@@ -179,8 +183,17 @@ find_repo <- function(repo_id, db = db.repo){
     repo_df[i] <- repo_df[[i]] %>% unlist
   }
   if(repo_df$license %>% length() > 0){
-    repo_df$license <- repo_df$license$name
+    if("name" %in% names(repo_df$license)){
+      repo_df$license <- repo_df$license$name
+    } else{
+      repo_df$license <- repo_df$license %>% toString()
+    }
   }
+}
+
+find_user_repo <- function(user_id, db = db.repo, reference = repo_user){
+  repo_id <- reference %>% filter(id = user_id)
+  
 }
 
 

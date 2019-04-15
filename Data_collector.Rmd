@@ -19,13 +19,13 @@ library(mongolite)
 # Set Up github API
 ```{r}
 oauth_endpoints("github")
-#projectApp <- oauth_app(appname = "GuanXin_Github_and_World",
-#                        key = "1151cd623b25dc65040b",
-#                        secret = "5343cd60555c10ccbeb6ace4adf8594b887f3024")
+projectApp <- oauth_app(appname = "GuanXin_Github_and_World",
+                        key = "1151cd623b25dc65040b",
+                        secret = "5343cd60555c10ccbeb6ace4adf8594b887f3024")
 
-projectApp <- oauth_app(appname = "JamesgeziqianGitOAuthApp",
-                        key = "885b524769dc6bef013f",
-                        secret = "ebac8d1117a038c5facb0a9f8d2be38833d37c60")
+#projectApp <- oauth_app(appname = "JamesgeziqianGitOAuthApp",
+#                        key = "885b524769dc6bef013f",
+#                        secret = "ebac8d1117a038c5facb0a9f8d2be38833d37c60")
 
 github_token <- oauth2.0_token(oauth_endpoints("github"), projectApp)
 gtoken <- config(token = github_token)
@@ -119,6 +119,7 @@ get_follering_by_id <- function(user_id, fromDB = db.userUnfetched){
     # get given id's following url (one url)
     foing_url <- df[["following_url"]] %>% unlist %>%
       str_remove("(\\{\\/other_user\\})")
+    print(foing_url[1])
     df <- github_get_with_url(foing_url[1]) %>% fromJSON()
     # get given id's following's url (many urls)
     foing_url <- df[["url"]] %>% unlist
@@ -229,16 +230,17 @@ following <- get_follering_by_id(33470168)
 # fetch
 ```{r}
 id_vec <- get_all_user_id()
+id_vec <- id_vec[-1]
 fetch_users(id_vec)
 # mongo_to_csv(db.userUnfetched, "user.csv")
 ```
 # funtions to store repositories
 ```{r}
 # copy user to user no repo
-id_vec <- get_all_user_id(db = db.user)
-for(i in 1:length(id_vec)) {
-  copy_user(id_vec[i], db.user, db.userNoRepo)
-}
+#id_vec <- get_all_user_id(db = db.user)
+#for(i in 1:length(id_vec)) {
+#  copy_user(id_vec[i], db.user, db.userNoRepo)
+#}
 
 # fetch given user's repos
 id_get_repo <- function(id_vec, toDB = db.repo, id_from_DB, id_to_DB){
