@@ -133,8 +133,10 @@ bio_df$student <- bio_df$bio %>%
   str_detect("(S|s)tudent|(c|C)andidate|(p|P)\\.?(H|h)\\.?(d|D)\\.?")
 bio_df$engineer <- bio_df$bio %>% 
   str_detect("(E|e)ngineer")
-  
-bio_df <- bio_df %>% select(university, professor, student, engineer, bio, company)
+
+# bio_df$company <- bio_df$company %>% str_remove_all("@") %>% tolower() %>% str_trim()
+# bio_df %>% group_by(company) %>% count %>% arrange (desc(n))
+# bio_df <- bio_df %>% select(university, professor, student, engineer, bio, company)
 
 
 outlier <- function(df, variable_name){
@@ -152,9 +154,38 @@ clean_following %>% filter(following < 250) %>% count / clean_following %>% coun
 ggplot(data = clean_following %>% filter(following < 250)) +
   geom_histogram(mapping = aes(x = following, y = ..density..), bins = 20) +
   geom_density(mapping = aes(x = following), bins = 20)
-# user_readable_df %>% filter(following > 3000) %>% select (login, id, following) %>% arrange (desc(following))
+user_readable_df %>% filter(following > 3000) %>% select (login, id, following) %>% arrange (desc(following))
 ggplot(data = clean_following) +
   geom_smooth(mapping = aes(x = following, y = followers)) 
 ```
+# Relate user with their repositories
+```{r}
+get_repo_with_owner <- function(db = db.repo){
+  df <- db$find('{}', field = '{"id" : true, "owner.id" : true, "_id" : false }')
+  df$id <- df$id %>% sapply(unlist)
+  df$owner <- df$owner$id %>% unlist
+  return(df)
+}
 
+find_repo <- function(repo_id, db = db.repo){
+  query <- sprintf('{ "id" : %s }', repo_id)
+  repo_df <- db$find(query) %>% select(-owner)
+  fields <- c("id","name","fork","size","stargazers_count",
+              "watchers_count","language", "has_pages", 
+              "forks_count", "archived", "disabled",
+              "open_issues_count", "license")
+  repo_df <- repo_df %>% select(fields)
+  for(i in 1:12){
+    repo_df[i] <- repo_df[[i]] %>% unlist
+  }
+  if(repo_df$license %>% length() > 0){
+    repo_df$license <- repo_df$license$name
+  }
+}
+
+
+repo_user_reference <- get_repo_with_owner()
+
+
+```
 

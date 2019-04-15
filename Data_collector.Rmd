@@ -19,13 +19,13 @@ library(mongolite)
 # Set Up github API
 ```{r}
 oauth_endpoints("github")
-projectApp <- oauth_app(appname = "GuanXin_Github_and_World",
-                        key = "1151cd623b25dc65040b",
-                        secret = "5343cd60555c10ccbeb6ace4adf8594b887f3024")
+#projectApp <- oauth_app(appname = "GuanXin_Github_and_World",
+#                        key = "1151cd623b25dc65040b",
+#                        secret = "5343cd60555c10ccbeb6ace4adf8594b887f3024")
 
-#projectApp <- oauth_app(appname = "JamesgeziqianGitOAuthApp",
-#                        key = "885b524769dc6bef013f",
-#                        secret = "ebac8d1117a038c5facb0a9f8d2be38833d37c60")
+projectApp <- oauth_app(appname = "JamesgeziqianGitOAuthApp",
+                        key = "885b524769dc6bef013f",
+                        secret = "ebac8d1117a038c5facb0a9f8d2be38833d37c60")
 
 github_token <- oauth2.0_token(oauth_endpoints("github"), projectApp)
 gtoken <- config(token = github_token)
@@ -38,7 +38,6 @@ github_get <- function(path){
 
 # This function get a json file from given url
 github_get_with_url<- function(path){
-  url <- modify_url(path)
   req <- GET(path, gtoken) 
   stop_for_status(req)
   req <- req %>% content %>% jsonlite::toJSON()
@@ -53,6 +52,10 @@ db.user <- mongo(collection = "users", db = "github", url = "mongodb://localhost
 db.repo <- mongo(collection = "repos", db = "github", url = "mongodb://localhost:27123")
 # db for users we haven't fetch followers
 db.userUnfetched <- mongo(collection = "unfetched", db = "github", url = "mongodb://localhost:27123")
+# db for user finished with repo fetched
+db.userWithRepo <- mongo(collection = "userWithRepo", db = "github", url = "mongodb://localhost:27123")
+# db for user without repo fetched
+db.userNoRepo <- mongo(collection = "userNoRepo", db = "github", url = "mongodb://localhost:27123")
 ```
 
 # functions to process user information
@@ -157,11 +160,31 @@ move_user <- function(user_id, fromDB = db.userUnfetched, toDB = db.user){
   }
 }
 
+copy_user <- function(user_id, fromDB, toDB){
+  result <- 0
+  fetch_query <- sprintf('{"id" : %s}', user_id)
+  df <- fromDB$find(fetch_query)
+  if (df %>% length() == 0){
+    return(-1)
+  } else {
+    if (toDB$find(fetch_query) %>% length() > 0){
+      toDB$remove(fetch_query)
+      result <- 1
+    }
+    toDB$insert(df)
+    print(result)
+    return(result)
+  }
+}
+
 # fetch users following and followers given a vector of user id.
 fetch_users<- function(id_vec){
   for(i in 1:length(id_vec)){
     get_follering_by_id(id_vec[i])
     get_follers_by_id(id_vec[i])
+    print("finish fetching one person")
+    copy_user(id_vec[i], fromDB = db.userUnfetched, toDB = db.userNoRepo)
+    print("finish copying to userNoRepo")
     move_user(id_vec[i])
   }
 }
@@ -195,21 +218,7 @@ mongo_to_csv <- function(database, file_name){
   write.csv(df, file = file_name, row.names = F)  
 }
 ```
-# funtions to store repositories
-```{r}
-id_get_repo <- function(user_id, toDB = db.repo ){
-  
-}
-toDB <- db.repo
-user_id <- 33470168
-query <- sprintf('{"id" : %s}', user_id)
-user_df <- db.user$find(query)
-if (user_df %>% length > 0){
-  repo_url <- user_df[["repos_url"]] %>% unlist
-  repos_json <- github_get_with_url(repo_url) %>% fromJSON
-  db.repo$insert(repos_json)
-}
-```
+
 # set up
 ```{r}
 store_user_to_db(user_url = "https://api.github.com/users/imbaguanxin", dest_db = db.userUnfetched, check_db = db.user)
@@ -222,6 +231,36 @@ following <- get_follering_by_id(33470168)
 id_vec <- get_all_user_id()
 fetch_users(id_vec)
 # mongo_to_csv(db.userUnfetched, "user.csv")
+```
+# funtions to store repositories
+```{r}
+# copy user to user no repo
+id_vec <- get_all_user_id(db = db.user)
+for(i in 1:length(id_vec)) {
+  copy_user(id_vec[i], db.user, db.userNoRepo)
+}
+
+# fetch given user's repos
+id_get_repo <- function(id_vec, toDB = db.repo, id_from_DB, id_to_DB){
+  for(i in 1:length(id_vec)){
+    user_id <- id_vec[i]
+    query <- sprintf('{"id" : %s}', user_id)
+    user_df <- id_from_DB$find(query)
+    if (user_df %>% length > 0){
+      repo_url <- user_df[["repos_url"]] %>% unlist
+      print(repo_url)
+      repos_json <- github_get_with_url(repo_url) %>% fromJSON
+      if(repos_json %>% length > 0) {
+        toDB$insert(repos_json)
+      }
+    }
+    move_user(id_vec[i], fromDB = id_from_DB, toDB = id_to_DB)
+  }
+}
+
+# fetch user's repo from userNoRepo data base
+id_vec <- get_all_user_id(db = db.userNoRepo)
+id_get_repo(id_vec, toDB = db.repo, id_from_DB = db.userNoRepo, id_to_DB = db.userWithRepo)
 ```
 # export to df and csv
 ```{r}
@@ -238,7 +277,9 @@ ggplot(data = df) +
   geom_point(mapping = aes(x = followers, y = following), position = "jitter")
 
 ```
+# timer
 
+repeat fetching user
 ```{r}
 timer <- function(interval = 3601){
   id_vec <- get_all_user_id()
