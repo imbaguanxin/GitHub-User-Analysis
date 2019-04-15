@@ -139,9 +139,10 @@ companys <- bio_df$company %>% str_remove_all("@") %>% tolower()  %>%
   str_remove_all("\\b(com|inc|io|http(:|s:?)?|llc|ltd|io|www|net|org)\\b|[^\\w\\s]")
 companys <- data.frame(companys, stringsAsFactors = FALSE) %>% 
   group_by(companys) %>% count() %>% arrange(desc(n))
-# bio_df <- bio_df %>% select(university, professor, student, engineer, bio, company)
+companys[-1,] %>% with(wordcloud(companys, n, max.words = 50, colors=brewer.pal(8, "Dark2")))
+```
 
-
+```{r}
 outlier <- function(df, variable_name){
   mean <- mean(df[,variable_name])
   threeSd <- sd(df[,variable_name]) * 3
@@ -169,12 +170,17 @@ get_repo_with_owner <- function(db = db.repo){
   df$owner <- df$owner$id %>% unlist
   return(df)
 }
+# build a repo_user data frame where user's numerical and catagorical information included
 repo_user <- get_repo_with_owner()
+bio_df <- bio_df %>% select(id, public_repos, public_gists, following, followers, student, professor, engineer, university)
+colnames(bio_df)[1] <- "owner"
+bio_df$owner <- bio_df$owner %>% as.numeric()
+repo_user <- inner_join(repo_user, bio_df, by = "owner")
 
 # find out a given repo id from database named db.repo
 # return a data frame has columes of id, name, fork, size, stargazers count,
-# watchers count, language, has pages, forks count, archived, disabled,
-# open issues count, license.
+# watchers count, language, has pages, forks count, archived, disabled and
+# open issues count.
 # some of the fields may be NA
 find_repo <- function(repo_id, db = db.repo){
   query <- sprintf('{ "id" : %s }', repo_id)
@@ -182,7 +188,7 @@ find_repo <- function(repo_id, db = db.repo){
   fields <- c("id","name","fork","size","stargazers_count",
               "watchers_count","language", "has_pages", 
               "forks_count", "archived", "disabled",
-              "open_issues_count", "license")
+              "open_issues_count")
   repo_df <- repo_df %>% select(fields)
   for(i in 1:12){
     if (repo_df[[i]] %>% class == "data.frame"){
@@ -192,15 +198,6 @@ find_repo <- function(repo_id, db = db.repo){
     }
   }
   repo_df$has_pages <- repo_df$has_pages %>% unlist
-  if(repo_df$license %>% length() > 0){
-    if("name" %in% names(repo_df$license)){
-      repo_df$license <- repo_df$license$name
-    } else{
-      repo_df$license <- repo_df$license %>% toString()
-    }
-  } else {
-    repo_df$license <- NA
-  }
   return(repo_df)
 }
 
@@ -217,7 +214,14 @@ find_user_repo <- function(user_id, db = db.repo, reference = repo_user){
   repo_df
 }
 
+repo_id_vec <- repo_user$id
+repo_df <- data.frame()
+for (i in 1:length(repo_id_vec)){
+  print(i)
+  repo_df <- rbind(repo_df, find_repo(repo_id_vec[i]))
+}
+
 find_user_repo(33470168)
-temp <- find_repo(173036713)
+find_repo(repo_id_vec[10])$license
 ```
 
