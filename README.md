@@ -1,4 +1,5 @@
 # GitHub User Analysis
+[![LICENSE](https://img.shields.io/badge/license-Anti%20996-blue.svg)](https://github.com/996icu/996.ICU/blob/master/LICENSE)
 ### Members: Xin Guan | Ziqian Ge
 
 GitHub is one of the biggest open source community and a large proportion of programmer do have a GitHub account. As a result, we think GitHub users are a good representation of all programmers.
@@ -25,7 +26,7 @@ The analysis will include two part.
 - GitHub user’s repositories:
 
   We are trying to look at what language do they use and Characteristic of their repositories
-  
+
 ## Prediction
 We are trying to predict the the popularity of a user's repository based ou given user and given user's other repositories.
 
@@ -52,7 +53,7 @@ Consequently, people in **user** are those who have been processed while those i
 Each time going through **unfetched** collection helps me get people in to **user** collection.
 
 1. Replace GitHub Api key in the Rmd file with your own key.
-2. Set up a mongoDB and save the url and port information. Then connect to your mongoDB. 
+2. Set up a mongoDB and save the url and port information. Then connect to your mongoDB.
 3. Go to code block named `set up`. replace the api url of the author with whichever GitHub user you like. If you decide not to change, the data might be biased since I am Chinese and my followers and followings are also Chinese. If you are not going run the `start fetch` for multiple time, you might be restricted to a Chinese GitHub community.
 3. run the rest of the code.
 4. run the last block whoes name is `start fetch` multiple time populates the data base.

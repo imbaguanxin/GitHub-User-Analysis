@@ -230,10 +230,17 @@ following <- get_follering_by_id(33470168)
 # fetch
 ```{r}
 id_vec <- get_all_user_id()
-id_vec <- id_vec[-1]
 fetch_users(id_vec)
 # mongo_to_csv(db.userUnfetched, "user.csv")
 ```
+# move all userUnfetched to userNoRepo
+```{r}
+id_vec <- get_all_user_id(db = db.userUnfetched)
+for(i in 1:length(id_vec)){
+  move_user(id_vec[i], fromDB = db.userUnfetched, toDB = db.userNoRepo)
+}
+```
+
 # funtions to store repositories
 ```{r}
 # copy user to user no repo
@@ -262,6 +269,7 @@ id_get_repo <- function(id_vec, toDB = db.repo, id_from_DB, id_to_DB){
 
 # fetch user's repo from userNoRepo data base
 id_vec <- get_all_user_id(db = db.userNoRepo)
+id_vec <- id_vec[-1]
 id_get_repo(id_vec, toDB = db.repo, id_from_DB = db.userNoRepo, id_to_DB = db.userWithRepo)
 ```
 # export to df and csv
