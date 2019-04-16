@@ -179,11 +179,24 @@ popularity_index <- function(repos) {
 
 ```{r}
 # repo_user <- get_repo_with_owner()
-repo_input <- read.csv("repo_user.csv")
+repo_input <- read.csv("repo_user.csv", stringsAsFactors = FALSE)
 
 #repo_input$popularity_raw <- repo_input %>% popularity_index()
 repo_input$popularity_normalized <- repo_input %>% popularity_index()
 repo_input <- repo_input %>% na.omit()
+
+possibleLanguage <- repo_input$language %>% unique()
+training_set <- data.frame()
+testing_set <- data.frame()
+for (lan in possibleLanguage){
+  df <- repo_input %>% filter(language = lan)
+  testing_number <- sample(c(1:nrow(df)), size = floor(nrow(df) * 0.5), replace = FALSE)
+  this_test <- df[testing_number,]
+  this_train <- df[-testing_number,]
+  testing_set <- testing_set %>% rbind(this_test)
+  training_set <- traning_set %>% rbin(this_train)
+}
+
 
 training_set <- sample_frac(repo_input, 0.7)
 testing_set <- setdiff(repo_input, training_set)
