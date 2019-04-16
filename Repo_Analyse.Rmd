@@ -20,12 +20,13 @@ userdb_170415 <- mongo(db = "users", collection = "users_170415", url = "mongodb
 repodb_170415 <- mongo(db = "repos", collection = "repos_170415", url = "mongodb://127.0.0.1:27017")
 userdb_160415 <- mongo(db = "users", collection = "users_160415", url = "mongodb://127.0.0.1:27017")
 repodb_160415 <- mongo(db = "repos", collection = "repos_160415", url = "mongodb://127.0.0.1:27017")
+github_RepoUsers <- mongo(db = "github", collection = "repo_users", url = "mongodb://127.0.0.1:27017")
 ```
 ```{r}
 userdb_190401$import(file("/Volumes/LaCie/MongoDB/db/dump_2019_04_01/github/users.bson"), bson = TRUE)
-repodb_190401$import(file("/Volumes/LaCie/MongoDB/db/dump_2019_04_01/github/repos.bson"), bson = TRUE)
+#repodb_190401$import(file("/Volumes/LaCie/MongoDB/db/dump_2019_04_01/github/repos.bson"), bson = TRUE)
 #userdb_190401$import(file("~/overview-f17/MongoDB/db/dump_2019_04_01/github/users.bson"), bson = TRUE)
-#repodb_190401$import(file("~/overview-f17/MongoDB/db/dump_2019_04_01/github/repos.bson"), bson = TRUE)
+repodb_190401$import(file("~/overview-f17/MongoDB/db/dump_2019_04_01/github/repos.bson"), bson = TRUE)
 userdb_180415$import(file("/Volumes/LaCie/MongoDB/db/dump_2018_04_15/github/users.bson"), bson = TRUE)
 repodb_180415$import(file("/Volumes/LaCie/MongoDB/db/dump_2018_04_15/github/repos.bson"), bson = TRUE)
 userdb_170415$import(file("/Volumes/LaCie/MongoDB/db/dump_2017_04_15/github/users.bson"), bson = TRUE)
@@ -138,6 +139,89 @@ repoProperties_190401 <- repoProperties_190401 %>%
          | (subscribers_count > 0)) %>%
   arrange(desc(stargazers_count + forks_count + open_issues_count + subscribers_count))
 View(repoProperties_190401)
+avgForks <- mean(repoProperties_190401$forks_count)
+stdDevForks <- sd(repoProperties_190401$forks_count)
+avgIssues <- mean(repoProperties_190401$open_issues_count)
+stdDevIssues <- sd(repoProperties_190401$open_issues_count)
+repoProperties_190401 %>%
+  filter(forks_count > avgForks - 3 * stdDevForks & forks_count < avgForks + 3 * stdDevForks) %>%
+  filter(open_issues_count > avgIssues - 3 * stdDevIssues & open_issues_count < avgIssues + 3 * stdDevIssues) %>%
+  ggplot(mapping = aes(x = forks_count, y = open_issues_count)) +
+  geom_point() + 
+  geom_smooth()
+```
+
+```{r}
+normalize <- function(x) {
+  numerator <- x
+  denominator <- max(x)
+  #print((numerator * 10) /denominator)
+  return((numerator) /denominator)
+}
+
+#normalize_st <- function(source, target) {
+#  combined <- c(target, source)
+#  combined_normalized <- normalize(combined)
+#  return(combined_normalized[1:length(target)])
+#}
+
+# formula to be changed
+popularity_index <- function(repos) {
+  pop_i <- (repos$stargazers_count + 1) %>% normalize()
+  pop_i <- pop_i + ((repos$watchers_count + 1) %>% normalize())
+  pop_i <- pop_i + ((repos$forks_count + 1) %>% normalize())
+  pop_i <- pop_i + ((repos$open_issues_count + 1) %>% normalize())
+  return(pop_i / 4)
+}
+
+
+```
+
+```{r}
+# repo_user <- get_repo_with_owner()
+repo_input <- read.csv("repo_user.csv")
+
+#repo_input$popularity_raw <- repo_input %>% popularity_index()
+repo_input$popularity_normalized <- repo_input %>% popularity_index()
+repo_input <- repo_input %>% na.omit()
+
+training_set <- sample_frac(repo_input, 0.7)
+testing_set <- setdiff(repo_input, training_set)
+
+#avg_pop_index <- c()
+#for (userId in repo_input$owner) {
+  #user_popularity_raw <- repo_input %>% filter(owner == userId) %>% popularity_index()
+  #user_popularity_normlized <- normalize_st(repo_input$popularity_raw, user_popularity_raw)
+  #avg_pop_index <- c(avg_pop_index, mean(user_popularity_normlized))
+#}
+#repo_input$owner_avg_pop_index <- avg_pop_index
+
+model_lm_quantifiable <- 
+  lm(formula = popularity_normalized ~ public_repos + public_gists + followers + following,
+             data = training_set)
+
+model_glm_quantifiable <- 
+  glm(formula = popularity_normalized ~ public_repos + public_gists + followers + following,
+             data = training_set,
+             family = binomial)
+
+model_lm <- 
+  lm(formula = popularity_normalized ~ public_repos + public_gists + followers + following + student + professor + engineer + university + language,
+             data = training_set)
+
+model_glm <- 
+  glm(formula = popularity_normalized ~ public_repos + public_gists + followers + following + student + professor + engineer + university + language,
+             data = training_set,
+             family = binomial)
+
+
+summary(model_lm)
+summary(model_glm)
+step(model_glm)
+
+probs <- predict(model_lm, newdata = testing_set, type = "response")
+head(test_set$Survived)
+head(probs)
 ```
 
 
