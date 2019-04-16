@@ -9,6 +9,10 @@ output: html_document
 knitr::opts_chunk$set(echo = TRUE)
 library(mongolite)
 library(tidyverse)
+library(tidyverse)
+library(class)
+library(e1071)
+library(MLmetrics)
 ```
 
 ```{r}
@@ -189,17 +193,17 @@ possibleLanguage <- repo_input$language %>% unique()
 training_set <- data.frame()
 testing_set <- data.frame()
 for (lan in possibleLanguage){
-  df <- repo_input %>% filter(language = lan)
+  df <- repo_input %>% filter(language == lan)
   testing_number <- sample(c(1:nrow(df)), size = floor(nrow(df) * 0.5), replace = FALSE)
   this_test <- df[testing_number,]
   this_train <- df[-testing_number,]
   testing_set <- testing_set %>% rbind(this_test)
-  training_set <- traning_set %>% rbin(this_train)
+  training_set <- training_set %>% rbind(this_train)
 }
 
 
-training_set <- sample_frac(repo_input, 0.7)
-testing_set <- setdiff(repo_input, training_set)
+#training_set <- sample_frac(repo_input, 0.7)
+#testing_set <- setdiff(repo_input, training_set)
 
 #avg_pop_index <- c()
 #for (userId in repo_input$owner) {
@@ -232,9 +236,67 @@ summary(model_lm)
 summary(model_glm)
 step(model_glm)
 
-probs <- predict(model_lm, newdata = testing_set, type = "response")
+probs <- predict(model_glm, newdata = testing_set, type = "response")
 head(test_set$Survived)
 head(probs)
 ```
 
+```{r}
+#repo_input%>% arrange(desc(popularity_normalized))
+summary_users <- function(repo_in){
+  users <- repo_in$owner %>% unique()
+  users_summary <- data.frame()
+  for (uid in users){
+    df <- repo_in %>% filter(owner == uid)
+    single_user_sum <- data.frame()
+    id <- uid
+    size <- df$size %>% mean()
+    repo <- df$public_repos %>% mean()
+    gist <- df$public_gists %>% mean()
+    following <- df$following %>% mean()
+    follower <- df$followers %>% mean()
+    stargazer <- df$stargazers_count %>% mean()
+    watcher <- df$watchers_count %>% mean()
+    fork <- df$forks_count %>% mean()
+    issue <- df$open_issues_count %>% mean()
+    student <- df$student[1]
+    professor <- df$professor[1]
+    engineer <- df$engineer[1]
+    university <- df$university[1]
+    language <- df %>% group_by(language) %>% count() %>% arrange(desc(n))
+    if (language %>% length > 0){
+      language <- language %>% head(1)
+      language <- language[1,1] %>% toString()
+    } else {
+      language <- NA
+    }
+    single_user_sum <- data.frame(id,size,repo,gist,following,follower,
+                                  stargazer,watcher,fork,issue,language,
+                                  student,professor,engineer,university)
+    users_summary <- users_summary %>% rbind(single_user_sum)
+  }
+  return(users_summary)
+}
+
+
+user_training_set <- summary_users(training_set) %>% select(-language)%>% na.omit()
+user_testing_set <- summary_users(testing_set) %>% select(-language) %>% na.omit()
+# knn for students
+pred1 <- knn(train = user_training_set %>% select(-c("id","professor","engineer","university")), 
+            test = user_testing_set%>% select(-c("id","professor","engineer","university")),
+            cl = user_training_set$student %>% as.factor(), k = 3)
+Accuracy(user_testing_set$student,pred1)
+pred2 <- knn(train = user_training_set %>% select(-c("id","student","engineer","university")), 
+            test = user_testing_set%>% select(-c("id","student","engineer","university")),
+            cl = user_training_set$professor %>% as.factor(), k = 3)
+Accuracy(user_testing_set$student,pred2)
+pred3 <- knn(train = user_training_set %>% select(-c("id","student","professor","university")), 
+            test = user_testing_set%>% select(-c("id","student","professor","university")),
+            cl = user_training_set$engineer %>% as.factor(), k = 3)
+Accuracy(user_testing_set$student,pred3)
+pred4 <- knn(train = user_training_set %>% select(-c("id","student","professor","engineer")), 
+            test = user_testing_set%>% select(-c("id","student","professor","engineer")),
+            cl = user_training_set$university %>% as.factor(), k = 3)
+Accuracy(user_testing_set$student,pred4)
+```
 
