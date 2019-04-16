@@ -185,21 +185,25 @@ repo_input <- read.csv("repo_user.csv", stringsAsFactors = FALSE)
 repo_input$popularity_normalized <- repo_input %>% popularity_index()
 repo_input <- repo_input %>% na.omit()
 
+avg_pi <- mean(repo_input$popularity_normalized)
+std_pi <- sd(repo_input$popularity_normalized)
+repo_input <- repo_input %>%
+  filter(popularity_normalized <= avg_pi + 3 * std_pi | popularity_normalized <= avg_pi + 3 * std_pi)
+
 possibleLanguage <- repo_input$language %>% unique()
 training_set <- data.frame()
 testing_set <- data.frame()
 for (lan in possibleLanguage){
-  df <- repo_input %>% filter(language = lan)
+  df <- repo_input %>% filter(language == lan)
   testing_number <- sample(c(1:nrow(df)), size = floor(nrow(df) * 0.5), replace = FALSE)
   this_test <- df[testing_number,]
   this_train <- df[-testing_number,]
   testing_set <- testing_set %>% rbind(this_test)
-  training_set <- traning_set %>% rbin(this_train)
+  training_set <- training_set %>% rbind(this_train)
 }
 
-
-training_set <- sample_frac(repo_input, 0.7)
-testing_set <- setdiff(repo_input, training_set)
+#training_set <- sample_frac(repo_input, 0.7)
+#testing_set <- setdiff(repo_input, training_set)
 
 #avg_pop_index <- c()
 #for (userId in repo_input$owner) {
@@ -231,10 +235,114 @@ model_glm <-
 summary(model_lm)
 summary(model_glm)
 step(model_glm)
-
-probs <- predict(model_lm, newdata = testing_set, type = "response")
-head(test_set$Survived)
-head(probs)
 ```
 
+Use linear regression on quantifiable columns only.
+```{r}
+probs <- predict(model_lm_quantifiable, newdata = testing_set, type = "response")
+#head(testing_set$popularity_normalized)
+#head(probs)
+comparing <- data.frame(probs %>% as.vector(), testing_set$popularity_normalized)
+colnames(comparing) <- c("prediction", "actual")
+accuracies <- abs(probs - testing_set$popularity_normalized)/testing_set$popularity_normalized
+accuracies[accuracies < 1] %>% length() / nrow(testing_set)
+```
 
+Use logistic regression on quantifiable columns only.
+```{r}
+probs <- predict(model_glm_quantifiable, newdata = testing_set, type = "response")
+#head(testing_set$popularity_normalized)
+#head(probs)
+comparing <- data.frame(probs %>% as.vector(), testing_set$popularity_normalized)
+colnames(comparing) <- c("prediction", "actual")
+accuracies <- abs(probs - testing_set$popularity_normalized)/testing_set$popularity_normalized
+accuracies[accuracies < 1] %>% length() / nrow(testing_set)
+```
+
+Use linear regression on all possible columns.
+```{r}
+probs <- predict(model_lm, newdata = testing_set, type = "response")
+#head(testing_set$popularity_normalized)
+#head(probs)
+comparing <- data.frame(probs %>% as.vector(), testing_set$popularity_normalized)
+colnames(comparing) <- c("prediction", "actual")
+accuracies <- abs(probs - testing_set$popularity_normalized)/testing_set$popularity_normalized
+accuracies[accuracies < 1] %>% length() / nrow(testing_set)
+```
+
+Use logistic regression on all possible columns.
+```{r}
+probs <- predict(model_glm, newdata = testing_set, type = "response")
+#head(testing_set$popularity_normalized)
+#head(probs)
+comparing <- data.frame(probs %>% as.vector(), testing_set$popularity_normalized)
+colnames(comparing) <- c("prediction", "actual")
+accuracies <- abs(probs - testing_set$popularity_normalized)/testing_set$popularity_normalized
+accuracies[accuracies < 1] %>% length() / nrow(testing_set)
+```
+
+```{r}
+#training_set$language <- training_set$language %>% as.factor()
+model_lm_student_quantifiable <- 
+  lm(formula = student ~ public_repos + public_gists + followers + following,
+             data = training_set)
+
+model_glm_student_quantifiable <- 
+  glm(formula = student ~ public_repos + public_gists + followers + following,
+             data = training_set,
+             family = binomial)
+
+model_lm_student <- 
+  lm(formula = student ~ public_repos + public_gists + followers + following + professor + engineer + university,
+             data = training_set)
+
+model_glm_student <- 
+  glm(formula = student ~ public_repos + public_gists + followers + following + professor + engineer + university,
+             data = training_set,
+             family = binomial)
+
+summary(model_lm_student_quantifiable)
+summary(model_glm_student_quantifiable)
+summary(model_lm_student_lang)
+summary(model_glm_student_lang)
+```
+
+Use linear regression on quantifiable columns only.
+```{r}
+probs <- predict(model_lm_student, newdata = testing_set, type = "response") %>% as.vector()
+#head(testing_set$popularity_normalized)
+#head(probs)
+preds <- ifelse(probs > 0.5, TRUE, FALSE)
+comparing <- tibble(Probability = probs, Predict = preds, Actual = testing_set$student)
+caret::confusionMatrix(factor(comparing$Predict), factor(comparing$Actual))
+```
+
+Use logistic regression on quantifiable columns only.
+```{r}
+probs <- predict(model_glm_student, newdata = testing_set, type = "response") %>% as.vector()
+#head(testing_set$popularity_normalized)
+#head(probs)
+preds <- ifelse(probs > 0.5, TRUE, FALSE)
+comparing <- tibble(Probability = probs, Predict = preds, Actual = testing_set$student)
+caret::confusionMatrix(factor(comparing$Predict), factor(comparing$Actual))
+```
+
+Use linear regression on all possible columns.
+```{r}
+probs <- predict(model_lm_student_quantifiable, newdata = testing_set, type = "response") %>% as.vector()
+#head(testing_set$popularity_normalized)
+#head(probs)
+preds <- ifelse(probs > 0.5, TRUE, FALSE)
+comparing <- tibble(Probability = probs, Predict = preds, Actual = testing_set$student)
+caret::confusionMatrix(factor(comparing$Predict), factor(comparing$Actual))
+```
+
+Use logistic regression on all possible columns.
+```{r}
+probs <- predict(model_glm_student_quantifiable, newdata = testing_set, type = "response") %>% as.vector()
+#head(testing_set$popularity_normalized)
+#head(probs)
+preds <- ifelse(probs > 0.5, TRUE, FALSE)
+comparing <- tibble(Probability = probs, Predict = preds, Actual = testing_set$student)
+caret::confusionMatrix(factor(comparing$Predict), factor(comparing$Actual))
+```
