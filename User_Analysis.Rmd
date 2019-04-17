@@ -49,7 +49,7 @@ mongo_to_csv <- function(database, file_name){
 # User data from mongodb
 ```{r User data from mongo db}
 user_df <- mongo_to_df(db.user)
-user_df <- user_df %>% rbind(mongo_to_df(db.userUnfetched))
+user_df <- user_df %>% rbind(mongo_to_df(db.userUnfetched)) %>% na.omit()
 
 # change data in character to numeric
 user_df$followers <- user_df$followers %>% as.numeric()
