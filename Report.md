@@ -5,8 +5,8 @@ In this part, we make use of GitHub API to fetch users along with repositories i
 
 We view the entire community as a social network. As a result, we can represent this community using a graph. We try to use a breath first search to go through this graph. However, compared to the hourly limitation of accessing the API (**5000** per hour), there are simply too many of the users out in the wild. We managed to download about **30.9** thousand users information to our data base for about 10 hours. After fetching users information, we tried to explore their repositories. We go through the entire list of users and download their repositories to our data base. Finally we managed to fetch about **611.1** thousand repositories.
 
-<img src="githubUser.png" alt="drawing" width="500"/>
-<img src="githubRepo.png" alt="drawing" width="500"/>
+<img src="githubUser.PNG" alt="drawing" width="500"/>
+<img src="githubRepo.PNG" alt="drawing" width="500"/>
 
 ### Data through GHTorrent
 
