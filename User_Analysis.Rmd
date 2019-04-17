@@ -17,7 +17,7 @@ library(reshape2)
 library(wordcloud)
 
 # db for users
-db.user <- mongo(collection = "users", db = "github", url = "mongodb://localhost:27123")
+db.user <- mongo(collection = "userWithRepo", db = "github", url = "mongodb://localhost:27123")
 # db for repositories
 db.repo <- mongo(collection = "repos", db = "github", url = "mongodb://localhost:27123")
 # db for users we haven't fetch followers
@@ -48,8 +48,7 @@ mongo_to_csv <- function(database, file_name){
 
 # User data from mongodb
 ```{r User data from mongo db}
-user_df <- mongo_to_df(db.user)
-user_df <- user_df %>% rbind(mongo_to_df(db.userUnfetched)) %>% na.omit()
+user_df <- mongo_to_df(db.user) %>% na.omit()
 
 # change data in character to numeric
 user_df$followers <- user_df$followers %>% as.numeric()
@@ -168,9 +167,11 @@ outlier <- function(df, variable_name){
 }
 
 # clean the data
-clean_following <- outlier(user_readable_df %>% filter(following > 0, followers > 0), "following") 
-# find out the porpotion of people have less than 250 following: 93%
-clean_following %>% filter(following < 250) %>% count / clean_following %>% count()
+clean_following <- outlier(user_readable_df, "following")
+# find out the porpotion of people have less than 250 following: 94%
+user_readable_df %>% filter(following < 250) %>% count / (user_readable_df %>% count())
+# find out the porpotion of people have less than 100 following: 84%
+user_readable_df %>% filter(following < 100) %>% count / (user_readable_df %>% count())
 
 # the distribution of user's number of following
 ggplot(data = clean_following %>% filter(following < 250)) +
@@ -179,6 +180,15 @@ ggplot(data = clean_following %>% filter(following < 250)) +
 # the relationship between following and followers
 ggplot(data = clean_following) +
   geom_smooth(mapping = aes(x = following, y = followers)) 
+
+# correlation when followers is smaller than 100: 0.287
+low_following <- clean_following %>%
+  filter(followers < 100, following < 100)
+cor(low_following$following, low_following$followers) 
+# correlation when followers and following are big: -0.019
+high_following <- clean_following %>%
+  filter(followers > 100, following > 100)
+cor(high_following$following, high_following$followers) 
 ```
 # Relate user with their repositories
 ```{r}
@@ -242,6 +252,6 @@ for (i in 1:length(repo_id_vec)){
 }
 # join user and repo so that an entry shows not only the repo's information but also the user's
 temp <- inner_join(repo_user, repo_df, by = "id")
-write.csv(temp, file = "repo_user.csv",row.names = FALSE)
+write.csv(temp, file = "repo_user2.csv",row.names = FALSE)
 ```
 
