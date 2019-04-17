@@ -75,8 +75,8 @@
 <h3 id="languages">Languages</h3>
 <p>We analyzed trends on popular languages, and here is insight on what we had found.</p>
 <p>This is a word cloud of languages weighted by the number of repositories that use it in 2016 on the left and in 2019 on the right.</p>
-<img src="images/lang_2016.png" width="250">
-<img src="images/lang_2019.png" width="250">
+<img src="images/lang_2016.png" width="500">
+<img src="images/lang_2019.png" width="500">
 
 <p>Below is a bar chart on language trends.</p>
 <img src="images/lang_bar.png" alt="drawing">
@@ -98,6 +98,7 @@
 <p>As we can see from the charts above, there might not be a very clear correlation between properties of a repo. Although it is noticed that <code>subscribers_count</code> is likely to have a linear relation with <code>forks_count</code>, and <code>subscribers_count</code> is likely to have a linear relation with <code>stargazers_count</code> with a non-differentiable singular point, in one sentence the correlation between repo properties is not clear.</p>
 <h2 id="prediction-on-popularity-and-other-properties">Prediction on popularity and other properties</h2>
 <p>We were attempting to make an artificial representative of popularity of a repo, and try to predict that popularity by properties of the owner of that repo.</p>
+<p>The work of relating repositories with their owners require too much computing power and up till the time we are to submit the report, our machine was still running. We selected a part of our data, which has about 8000 records, so that we can move on to do prediction.</p>
 <p>First thing to do is to find that representative of popularity. After a few attempting, we decide to use the mean of normalized <code>stargazers_count</code>, <code>forks_count</code>, <code>open_issues_count</code>, and <code>subscribers_count</code> as our representative.</p>
 <p>Next thing is what should our prediction be based on. We found that among properties of a user, the number of <code>public_repos</code>, <code>public_gists</code>, <code>followers</code>, and <code>followings</code> are quantifiable properties and are good for analysis. Other properties that are either true/false, such as if this user is a <code>student</code>, or a <code>professor</code>, or a <code>engineer</code>, or work in a <code>university</code>, are also considered in a new model, distinct with the model that only contains quantifiable properties.</p>
 <p>We built a linear regression model and a binomial regression model on all quantifiable properties. Because it is a continuous variable, and we did not have a large training set, our prediction was pretty poor. The ratio that our prediction was <strong><em>100%</em></strong> away from the actual value was around <strong><em>85%</em></strong>, and the ratio <strong><em>50%</em></strong> away from the actual value was only around <strong><em>16%</em></strong>.</p>

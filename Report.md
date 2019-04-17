@@ -87,8 +87,8 @@ We analyzed trends on popular languages, and here is insight on what we had foun
 
 This is a word cloud of languages weighted by the number of repositories that use it in 2016 on the left and in 2019 on the right.
 
-<img src="images/lang_2016.png" width="250"/>
-<img src="images/lang_2019.png" width="250"/>
+<img src="images/lang_2016.png" width="500"/>
+<img src="images/lang_2019.png" width="500"/>
 
 Below is a bar chart on language trends.
 
