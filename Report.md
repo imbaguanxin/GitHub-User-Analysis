@@ -48,6 +48,12 @@ We tried to detect whether users fall in the four collections: `student`, `resea
 
 In this part, the greatest difficulty is that we managed to extract a single word from the self-introduction. However, we break some of the word pairs, such like _software develope_. _machine learning_, _Neuro-linguistic programming_ and _natural language processing_. We didn't find a way to keep those phrases since we split all the words by spaces.
 
+### What do GitHub users working for
+
+We analyze the company field in the data and try to figure out what organizations hire these users.
+
+<img src="user-company.png" alt="drawing" width="500"/>
+
 ### Followers and following
 
 We are trying to find a relationship between number of followers and following in this section. We first deals with outliers to clean bots which I have mentioned in the data cleaning part.
