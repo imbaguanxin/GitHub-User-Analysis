@@ -121,6 +121,8 @@ As we can see from the charts above, there might not be a very clear correlation
 
 We were attempting to make an artificial representative of popularity of a repo, and try to predict that popularity by properties of the owner of that repo.
 
+The work of relating repositories with their owners require too much computing power and up till the time we are to submit the report, our machine was still running. We selected a part of our data, which has about 8000 records, so that we can move on to do prediction.
+
 First thing to do is to find that representative of popularity. After a few attempting, we decide to use the mean of normalized `stargazers_count`, `forks_count`, `open_issues_count`, and `subscribers_count` as our representative.
 
 Next thing is what should our prediction be based on. We found that among properties of a user, the number of `public_repos`, `public_gists`, `followers`, and `followings` are quantifiable properties and are good for analysis. Other properties that are either true/false, such as if this user is a `student`, or a `professor`, or a `engineer`, or work in a `university`, are also considered in a new model, distinct with the model that only contains quantifiable properties.
