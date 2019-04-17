@@ -6,7 +6,10 @@ output:
   pdf_document: default
   html_notebook: default
 ---
+# GitHub Api and Data Collection
 
+In this part, we made use of GitHub Api to fetch user and repositories information. 
+We view the network
 ```{r setup, include=FALSE}
 knitr::opts_chunk$set(echo = TRUE)
 library(tidyverse)
@@ -161,6 +164,9 @@ move_user <- function(user_id, fromDB = db.userUnfetched, toDB = db.user){
   }
 }
 
+# copy a user, if no user in fromDB, return -1
+# if there is duplicated user in toDB, renew it and return 1
+# if there is no duplication in toDB, copy and return 0
 copy_user <- function(user_id, fromDB, toDB){
   result <- 0
   fetch_query <- sprintf('{"id" : %s}', user_id)
