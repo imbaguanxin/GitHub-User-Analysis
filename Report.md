@@ -7,6 +7,7 @@ We view the entire community as a social network. As a result, we can represent 
 
 <img src="githubUser.png" alt="drawing" width="500"/>
 <img src="githubRepo.png" alt="drawing" width="500"/>
+
 ### Data through GHTorrent
 
 GHTorrent is a project that stores all the activities on GitHub every day, including commits, commit comments, user information change, issues, etc. We can download all the activities of a given day from its download center in the form of MongoDB dumps (bson files). We made used of data on 04/01/2019, 04/15/2018, 04/15/2017, 04/15/2016.
