@@ -1,3 +1,9 @@
+# GitHub User Analysis
+
+Member: Xin Guan | Ziqian Ge
+
+GitHub is a web-based hosting service of version control using Git. It claims to be the world's largest community of developers and discovers. Up to October 2018, there are 31 million users and over 100 million repositories on GitHub. According to Evans Data Corporation(EDC) there are about 23 million developers worldwide. So we believe that Github is a good representation of United States even world developers. We would like to study the collection of developers through analyzing GitHub community.Our goal in this project is finding out who are these developers and popular trends among them.
+
 ## Data Collection
 
 ###  Data through GitHub API
@@ -127,10 +133,7 @@ Since our prediction on popularity of a repo did not get a good result, we turne
 
 Just like what we have done with repo properties, we built a linear regression model on quantifiable properties, i.e. `public_repos`, `public_gists`, `followers`, and `followings`. We then made a prediction on properties representing if this user is a student or professor or engineer or work in university. We also have made a binomial regression model and on more properties, not only quantifiable ones, and made a new prediction. The result was similar to linear regression model and to models with fewer inputs.
 
-Our linear regression model that predicts if a user is a student was about ***93%*** accurate, and our binomial regression model gave a similar result.
-Our linear regression model that predicts if a user is a professor was about ***84%*** accurate, and our binomial regression model gave a similar result.
-Our linear regression model that predicts if a user is an engineer was about ***87%*** accurate, and our binomial regression model gave a similar result.
-Our linear regression model that predicts if a user works in a university was about ***75%*** accurate, and our binomial regression model gave a similar result.
+Our linear regression model that predicts if a user is a student was about ***93%*** accurate, and our binomial regression model gave a similar result. Our linear regression model that predicts if a user is a professor was about ***84%*** accurate, and our binomial regression model gave a similar result. Our linear regression model that predicts if a user is an engineer was about ***87%*** accurate, and our binomial regression model gave a similar result. Our linear regression model that predicts if a user works in a university was about ***75%*** accurate, and our binomial regression model gave a similar result.
 
 Result of regression above was acceptable.
 
