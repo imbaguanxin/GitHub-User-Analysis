@@ -6,6 +6,7 @@ In this part, we make use of GitHub API to fetch users along with repositories i
 We view the entire community as a social network. As a result, we can represent this community using a graph. We try to use a breath first search to go through this graph. However, compared to the hourly limitation of accessing the API (**5000** per hour), there are simply too many of the users out in the wild. We managed to download about **30.9** thousand users information to our data base for about 10 hours. After fetching users information, we tried to explore their repositories. We go through the entire list of users and download their repositories to our data base. Finally we managed to fetch about **611.1** thousand repositories.
 
 <img src="githubUser.PNG" alt="drawing" width="500"/>
+
 <img src="githubRepo.PNG" alt="drawing" width="500"/>
 
 ### Data through GHTorrent
@@ -29,6 +30,7 @@ We also deal with the outliers when analysing followers and followings. We disco
 We find out people with an location. Then, collect those locations. Some of the users enter different locations seperated by comma, so we also split those phrases. Then, we drew a `wordcloud` and a `bar chart` based on those data.
 
 <img src="word-cloud-location.png" alt="drawing" width="500"/>
+
 <img src="location-plot.png" alt="drawing" width="500"/>
 
 We can see that San Francisco ranked first in all the cities, followed by Beijing and London. California has a high frequency of apperance in location discriptions. This result is making sense as regions ranked high in the list are traditionally considered as place where high tech company gathers.
@@ -40,6 +42,7 @@ We faced difficulties in location analysis. Since GitHub poses no restriction on
 We extract all the words in the field `bio`, which is a self-introduction of a user, and find out frequently appeard contents. Those high frequency words concludes the overall identity of the GitHub community.
 
 <img src="word-cloud-bio.png" alt="drawing" width="500"/>
+
 <img src="bio-plot.png" alt="drawing" width="500"/>
 
 We find that there are a large number of _developer_ and _engineer_ tags within the community. This is the evidence to support that GitHub is the largest the community of developers. We can see _student_ , _professor_ and _scientist_ from education or research institutes as well. Interestingly, we see _Phd_ in our word list. Though the difficulty to develope a software is decreasing these years, developers might still hold a high level of degree.
@@ -58,8 +61,9 @@ We analyze the company field in the data and try to figure out what organization
 
 We are trying to find a relationship between number of followers and following in this section. We first deals with outliers to clean bots which I have mentioned in the data cleaning part.
 
-<img src="followingdensity.png" alt="drawing" width="500"/>
-<img src="followers-following.png" alt="drawing" width="500"/>
+<img src="followingdensity.png" alt="drawing" width="400"/>
+
+<img src="followers-following.png" alt="drawing" width="600"/>
 
 We find that most of the user have a relatively low following and followers. **93%** of the users follow less than **250** users and **80%** follow less than **100**. We also find that the correlation between followings and followers are not very strong. When we are looking at an average user (followers and followings less than **100**), the coorelation is **0.287**. When we are looking at star users (followers greater than **100**), there is even a negative coorelation. From the graph above we can see that, there is a positive relation between followers and followings when the number of followers is small. This simulates a user starting to involve in this community. However, when follower grows, the curve is flat. There is a limitation on the size of social network and a user simply does not have enough efforts to know a lot people. When a user become a "star" in the community, he follows less user. I haven't firgured out why. Probably it's time to stay cool and focus on his or her own codes. For example, Linus Torvalds, the developer of linux kernel, follows no one and has over 90000 followers.
 
