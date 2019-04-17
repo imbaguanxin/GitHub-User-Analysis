@@ -63,9 +63,9 @@
 
 <h3 id="followers-and-following">Followers and following</h3>
 <p>We are trying to find a relationship between number of followers and following in this section. We first deals with outliers to clean bots which I have mentioned in the data cleaning part.</p>
-<img src="images/followingdensity.png" alt="drawing" width="400">
+<img src="images/followingdensity.png" alt="drawing" width="500">
 
-<img src="images/followers-following.png" alt="drawing" width="600">
+<img src="images/followers-following.png" alt="drawing" width="500">
 
 <p>We find that most of the user have a relatively low following and followers. <strong>93%</strong> of the users follow less than <strong>250</strong> users and <strong>80%</strong> follow less than <strong>100</strong>. We also find that the correlation between followings and followers are not very strong. When we are looking at an average user (followers and followings less than <strong>100</strong>), the correlation is <strong>0.287</strong>. When we are looking at star users (followers greater than <strong>100</strong>), there is even a negative correlation. From the graph above we can see that, there is a positive relation between followers and followings when the number of followers is small. This simulates a user starting to involve in this community. However, when follower grows, the curve is flat. There is a limitation on the size of social network and a user simply does not have enough efforts to know a lot people. When a user become a &quot;star&quot; in the community, he follows less user. I haven&apos;t figured out why. Probably it&apos;s time to stay cool and focus on his or her own codes. For example, Linus Torvalds, the developer of linux kernel, follows no one and has over 90000 followers.</p>
 <h3 id="relating-repositories-and-users">Relating repositories and users</h3>
@@ -109,8 +109,5 @@
 <p>We have also made a k-nn machine learning model to predict same properties like what we have done above with regression models.</p>
 <p>After normalized all variables, we fit them into k-nn algorithm in <code>class</code> package. Our accuracy predicting if a user is a student was about <strong><em>87%</em></strong> accurate. Our accuracy predicting if a user is a professor was about <strong><em>76%</em></strong> accurate. Our accuracy predicting if a user is a student was about <strong><em>84%</em></strong> accurate. Our accuracy predicting if a user is a student was about <strong><em>64%</em></strong> accurate.</p>
 <p>Result of k-nn algorithm above was also acceptable.</p>
-</article></div><div style="background-color: #b4b2b2;width: 50px;height:50px;line-height: 50px;text-align: center;position: fixed;bottom: 10px;right: 10px;padding-top:5px;" onclick="document.documentElement.scrollTop = document.body.scrollTop =0;">
-  <svg t="1533629773982" class="icon" style="" viewBox="0 0 1024 1024" version="1.1" xmlns="http://www.w3.org/2000/svg" p-id="1035" xlink="http://www.w3.org/1999/xlink" width="40" height="40"><defs><style type="text/css">@font-face { font-family: uc-nexus-iconfont; src: url("chrome-extension://pogijhnlcfmcppgimcaccdkmbedjkmhi/res/font_9qmmi8b8jsxxbt9.woff") format("woff"), url("chrome-extension://pogijhnlcfmcppgimcaccdkmbedjkmhi/res/font_9qmmi8b8jsxxbt9.ttf") format("truetype"); }
-  </style></defs><path d="M536.255427 195.182354c-7.804756-7.804756-17.966187-11.615549-28.311813-11.615549-9.43693 0-18.874883 3.449565-26.496467 10.163477-2.360767 1.452071-4.356214 3.267417-6.352685 5.262864L218.47792 455.611735c-15.607466 15.60542-15.607466 40.834011 0 56.43943 15.607466 15.607466 41.558511 15.607466 57.167001 0l193.46013-192.733583 0 600.526219c0 22.1423 17.787108 39.927361 39.927361 39.927361 22.140253 0 39.927361-17.785062 39.927361-39.927361L548.959773 319.317583 737.15704 508.422522c15.607466 15.607466 40.469714 15.607466 56.078203 0 15.607466-15.607466 15.425318-40.834011-0.182149-56.441477L536.255427 195.182354 536.255427 195.182354z" p-id="1036" fill="#333"/><path d="M101.784174 143.097092l816.674071 0c22.140253 0 39.925315-17.785062 39.925315-39.927361 0-22.140253-17.784038-39.925315-39.925315-39.925315L101.784174 63.244416c-22.140253 0-39.927361 17.785062-39.927361 39.925315C61.856813 125.31203 79.643921 143.097092 101.784174 143.097092L101.784174 143.097092z" p-id="1037" fill="#333"/></svg>
-</div>
+</article></div>
 </body></html>

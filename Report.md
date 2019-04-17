@@ -67,9 +67,9 @@ We analyze the company field in the data and try to figure out what organization
 
 We are trying to find a relationship between number of followers and following in this section. We first deals with outliers to clean bots which I have mentioned in the data cleaning part.
 
-<img src="images/followingdensity.png" alt="drawing" width="400"/>
+<img src="images/followingdensity.png" alt="drawing" width="500"/>
 
-<img src="images/followers-following.png" alt="drawing" width="600"/>
+<img src="images/followers-following.png" alt="drawing" width="500"/>
 
 We find that most of the user have a relatively low following and followers. **93%** of the users follow less than **250** users and **80%** follow less than **100**. We also find that the correlation between followings and followers are not very strong. When we are looking at an average user (followers and followings less than **100**), the correlation is **0.287**. When we are looking at star users (followers greater than **100**), there is even a negative correlation. From the graph above we can see that, there is a positive relation between followers and followings when the number of followers is small. This simulates a user starting to involve in this community. However, when follower grows, the curve is flat. There is a limitation on the size of social network and a user simply does not have enough efforts to know a lot people. When a user become a "star" in the community, he follows less user. I haven't figured out why. Probably it's time to stay cool and focus on his or her own codes. For example, Linus Torvalds, the developer of linux kernel, follows no one and has over 90000 followers.
 
