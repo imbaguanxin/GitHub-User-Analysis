@@ -57,3 +57,7 @@ Each time going through **unfetched** collection helps me get people in to **use
 3. Go to code block named `set up`. replace the api url of the author with whichever GitHub user you like. If you decide not to change, the data might be biased since I am Chinese and my followers and followings are also Chinese. If you are not going run the `start fetch` for multiple time, you might be restricted to a Chinese GitHub community.
 3. run the rest of the code.
 4. run the last block whoes name is `start fetch` multiple time populates the data base.
+
+After fetching all the users, there is another part that fetches user's repository, try to run that block will fetch all the repositories owned by users in db.userNoRepo. You can change the db as well.
+
+There is a block of code trying to export all repositories along with their owners information. It take a lot of time to run that block if you have a large number of repositories. I didn't managed to export all repositories we have (~610k). I only exported a small sample (~8k)
