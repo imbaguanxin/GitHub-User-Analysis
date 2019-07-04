@@ -11,10 +11,6 @@ For our project, we will be gathering as much GitHub user’s information as pos
 - email
 - repositories
 
-Also, we are going to get the data relating to economic, population and high-tech industry from:
-- OECD database
-- American Bureau of Labor Statistic
-
 We would like to retrieve data to a local database and clean them.
 
 ## Analysis
@@ -23,6 +19,7 @@ The analysis will include two part.
 
   We are trying to understand where are they, what institute do they work for, and how do they introduce themselves
   their repositories.
+  
 - GitHub user’s repositories:
 
   We are trying to look at what language do they use and Characteristic of their repositories
